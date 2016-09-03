@@ -27,7 +27,9 @@
 flowFile = session.get()
 if flowFile != None:
     greeting = flowFile.getAttribute("greeting")
-    log.info(greeting + ", Info")
     log.debug(greeting + ", Debug")
+    log.info(greeting + ", Info")
+    log.warn(greeting + ", Warn")
+    log.error(greeting + ", Error")
     session.transfer(flowFile, REL_SUCCESS)
 

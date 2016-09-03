@@ -85,13 +85,22 @@ public class TestJavascriptSamples extends BaseScriptTest {
         MockFlowFile result = successFlowFiles.get(0);
 
         MockComponentLog log = runner.getLogger();
-        List<LogMessage> infoMessages = log.getInfoMessages();
-        Assert.assertEquals(1, infoMessages.size());
-        Assert.assertTrue(infoMessages.get(0).getMsg().contains("Hello, Info"));
 
         List<LogMessage> debugMessages = log.getDebugMessages();
         Assert.assertEquals(1, debugMessages.size());
         Assert.assertTrue(debugMessages.get(0).getMsg().contains("Hello, Debug"));
+
+        List<LogMessage> infoMessages = log.getInfoMessages();
+        Assert.assertEquals(1, infoMessages.size());
+        Assert.assertTrue(infoMessages.get(0).getMsg().contains("Hello, Info"));
+
+        List<LogMessage> warnMessages = log.getWarnMessages();
+        Assert.assertEquals(1, warnMessages.size());
+        Assert.assertTrue(warnMessages.get(0).getMsg().contains("Hello, Warn"));
+
+        List<LogMessage> errorMessages = log.getErrorMessages();
+        Assert.assertEquals(1, errorMessages.size());
+        Assert.assertTrue(errorMessages.get(0).getMsg().contains("Hello, Error"));
     }
 
 
