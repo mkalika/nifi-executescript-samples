@@ -1,5 +1,6 @@
-# NiFi ExecuteScript Samples
+[![Build Status](https://travis-ci.org/BatchIQ/nifi-executescript-samples.svg)](https://travis-ci.org/BatchIQ/nifi-executescript-samples)
 
+# NiFi ExecuteScript Samples
 This repo contains samples scripts for use with Apache NiFi's ExecuteScript processor.
 Additionally, it the repo can be cloned and modified to unit test custom scripts using NiFi's mock framework.
 
