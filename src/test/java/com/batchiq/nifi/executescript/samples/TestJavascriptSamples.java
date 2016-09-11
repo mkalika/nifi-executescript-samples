@@ -179,4 +179,25 @@ public class TestJavascriptSamples extends BaseScriptTest {
         redFlowFile.assertAttributeEquals("color", "red");
     }
 
+    /**
+     * Demonstrates writing to counters
+     * @throws Exception
+     */
+    @Test
+    public void testCounter() throws Exception {
+        final TestRunner runner = TestRunners.newTestRunner(new ExecuteScript());
+        runner.setValidateExpressionUsage(false);
+        runner.setProperty(ExecuteScript.SCRIPT_ENGINE, "ECMAScript");
+        runner.setProperty(ExecuteScript.SCRIPT_FILE, "target/test/resources/javascript/counter.js");
+        runner.setProperty(ExecuteScript.MODULES, "target/test/resources/javascript");
+        runner.assertValid();
+
+        runner.enqueue("sample text".getBytes(StandardCharsets.UTF_8));
+        runner.run();
+
+        runner.assertAllFlowFilesTransferred("success", 1);
+        double counterValue = runner.getCounterValue("SampleScriptCounter");
+        Assert.assertEquals(1d, counterValue, 0.01d);
+    }
+
 }
