@@ -21,7 +21,13 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.nifi.processors.script.ExecuteScript;
-import org.apache.nifi.util.*;
+import org.apache.nifi.properties.NiFiPropertiesLoader;
+import org.apache.nifi.util.LogMessage;
+import org.apache.nifi.util.MockComponentLog;
+import org.apache.nifi.util.MockFlowFile;
+import org.apache.nifi.util.NiFiProperties;
+import org.apache.nifi.util.TestRunner;
+import org.apache.nifi.util.TestRunners;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Assert;
@@ -198,6 +204,34 @@ public class TestJavascriptSamples extends BaseScriptTest {
         runner.assertAllFlowFilesTransferred("success", 1);
         double counterValue = runner.getCounterValue("SampleScriptCounter");
         Assert.assertEquals(1d, counterValue, 0.01d);
+    }
+
+    /**
+     * Demonstrates reading values from nifi.properties
+     * @throws Exception
+     */
+    @Test
+    public void testProperties() throws Exception {
+        final TestRunner runner = TestRunners.newTestRunner(new ExecuteScript());
+        System.setProperty(NiFiProperties.PROPERTIES_FILE_PATH, "target/test/resources/conf/nifi.properties");
+        NiFiPropertiesLoader nifiPropertiesLoader = new NiFiPropertiesLoader();
+        NiFiProperties nifiProperties = nifiPropertiesLoader.get();
+
+        runner.setValidateExpressionUsage(false);
+        runner.setProperty(ExecuteScript.SCRIPT_ENGINE, "ECMAScript");
+        runner.setProperty(ExecuteScript.SCRIPT_FILE, "target/test/resources/javascript/properties.js");
+        runner.setProperty(ExecuteScript.MODULES, "target/test/resources/javascript");
+        runner.assertValid();
+
+        final Map<String, String> attributes = new HashMap<>();
+        attributes.put("property-name", "nifi.version");
+        runner.enqueue("sample text".getBytes(StandardCharsets.UTF_8), attributes);
+        runner.run();
+
+        runner.assertAllFlowFilesTransferred("success", 1);
+        final List<MockFlowFile> successFlowFiles = runner.getFlowFilesForRelationship("success");
+        MockFlowFile result = successFlowFiles.get(0);
+        result.assertAttributeEquals("property-value", nifiProperties.getProperty("nifi.version"));
     }
 
 }
