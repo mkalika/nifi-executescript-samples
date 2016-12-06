@@ -15,7 +15,7 @@
  */
 
 /******************************************************************************
- * Reading from nifi.properties in ExecuteScript
+ * Working with State values in ExecuteScript
  *
  * Variables provided in scope by script engine:
  *
@@ -30,18 +30,17 @@
 flowFile = session.get();
 if (flowFile != null) {
 
-    var NiFiPropertiesLoader = Java.type("org.apache.nifi.properties.NiFiPropertiesLoader");
+    var Scope = Java.type("org.apache.nifi.components.state.Scope");
+    var HashMap = Java.type("java.util.HashMap");
 
-    // Get property to read
-    var propertyName = flowFile.getAttribute("property-name");
+    // Get current state
+    var oldState = context.getStateManager().getState(Scope.CLUSTER);
+    var stateMessage = oldState.get("some-state");
 
-    // Get NiFi properties
-    var nifiPropertiesLoader = new NiFiPropertiesLoader();
-    var nifiProperties = nifiPropertiesLoader.get();
-
-    // Read property value
-    var propertyValue = nifiProperties.getProperty(propertyName);
-    flowFile = session.putAttribute(flowFile, "property-value", propertyValue);
+    // Set new state
+    var newState = new HashMap();
+    newState.put("some-state", stateMessage + "bar");
+    context.getStateManager().setState(newState, Scope.CLUSTER);
 
     session.transfer(flowFile, REL_SUCCESS);
 }

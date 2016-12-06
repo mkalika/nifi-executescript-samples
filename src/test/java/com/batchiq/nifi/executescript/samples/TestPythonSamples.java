@@ -20,6 +20,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.nifi.components.state.Scope;
+import org.apache.nifi.components.state.StateManager;
+import org.apache.nifi.components.state.StateMap;
 import org.apache.nifi.processors.script.ExecuteScript;
 import org.apache.nifi.properties.NiFiPropertiesLoader;
 import org.apache.nifi.util.LogMessage;
@@ -233,6 +236,33 @@ public class TestPythonSamples extends BaseScriptTest {
         final List<MockFlowFile> successFlowFiles = runner.getFlowFilesForRelationship("success");
         MockFlowFile result = successFlowFiles.get(0);
         result.assertAttributeEquals("property-value", nifiProperties.getProperty("nifi.version"));
+    }
+
+    /**
+     * Demonstrates reading and writing processor state values
+     * @throws Exception
+     */
+    @Test
+    public void testState() throws Exception {
+        final TestRunner runner = TestRunners.newTestRunner(new ExecuteScript());
+        runner.setValidateExpressionUsage(false);
+        runner.setProperty(ExecuteScript.SCRIPT_ENGINE, "python");
+        runner.setProperty(ExecuteScript.SCRIPT_FILE, "target/test/resources/python/state.py");
+        runner.setProperty(ExecuteScript.MODULES, "target/test/resources/python");
+        runner.assertValid();
+
+        StateManager stateManager = runner.getStateManager();
+        stateManager.clear(Scope.CLUSTER);
+        Map<String, String> initialStateValues = new HashMap<>();
+        initialStateValues.put("some-state", "foo");
+        stateManager.setState(initialStateValues, Scope.CLUSTER);
+
+        runner.enqueue("sample text".getBytes(StandardCharsets.UTF_8));
+        runner.run();
+
+        runner.assertAllFlowFilesTransferred("success", 1);
+        StateMap resultStateValues = stateManager.getState(Scope.CLUSTER);
+        Assert.assertEquals("foobar", resultStateValues.get("some-state"));
     }
 
 }
