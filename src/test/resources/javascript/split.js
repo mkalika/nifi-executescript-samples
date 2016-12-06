@@ -46,7 +46,7 @@ if (parentFlowFile !== null) {
         for (var i = 0; i < inputArray.length; i++) {
             var item = inputArray[i];
             log.info(item.color);
-            var splitFlowFile = session.clone(parentFlowFile);
+            var splitFlowFile = session.create(parentFlowFile);
             splitFlowFile = session.write(splitFlowFile, new OutputStreamCallback(function(outputStream) {
                 outputStream.write(JSON.stringify(item, null, "\t").getBytes(StandardCharsets.UTF_8));
             }));

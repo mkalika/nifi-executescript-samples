@@ -58,7 +58,7 @@ class SplitCallback(InputStreamCallback):
             fragment_index = 0
             for item in input_list:
                 color = item['color']
-                splitFlowFile = session.clone(self.parentFlowFile)
+                splitFlowFile = session.create(self.parentFlowFile)
                 writeCallback = WriteCallback()
                 writeCallback.content = json.dumps(item)
                 splitFlowFile = session.write(splitFlowFile, writeCallback)
