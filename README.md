@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/BatchIQ/nifi-executescript-samples.svg)](https://travis-ci.org/BatchIQ/nifi-executescript-samples)
+[![Run Status](https://api.shippable.com/projects/57eb01226fb4bc0e008f0352/badge?branch=master)](https://app.shippable.com/projects/57eb01226fb4bc0e008f0352)
 
 # NiFi ExecuteScript Samples
 This repo contains samples scripts for use with Apache NiFi's ExecuteScript processor.
